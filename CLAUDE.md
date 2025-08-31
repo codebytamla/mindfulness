@@ -76,6 +76,7 @@ Key enums define the scientific categorization system:
 - Single `NavigationView` in `ContentView` acts as coordinator
 - State-driven UI transitions using `@State` and `@Environment`
 - Full back navigation support throughout the flow
+- Progressive disclosure: Recent sessions (3 max) on dashboard, full history via "See All"
 
 **Data Persistence:**
 - SwiftData configured in `mindfulnessApp.swift`
@@ -84,11 +85,28 @@ Key enums define the scientific categorization system:
 
 ## File Organization
 
-- `mindfulnessApp.swift`: App entry point and SwiftData configuration
-- `ContentView.swift`: Main dashboard and navigation coordinator  
-- `MeditationAI.swift`: Core AI script generation engine
-- `Item.swift`: All data models and scientific categorization enums
-- View files follow descriptive naming: `*SelectionView.swift`, `*SessionView.swift`
+```
+mindfulness/
+├── mindfulnessApp.swift           # App entry point and SwiftData configuration
+├── Models/
+│   └── Item.swift                 # SwiftData models and scientific categorization enums
+├── Services/
+│   └── MeditationAI.swift        # AI script generation engine
+├── Views/
+│   ├── ContentView.swift         # Main dashboard and navigation coordinator
+│   ├── Onboarding/              # Meditation creation flow
+│   │   ├── EmotionSelectionView.swift
+│   │   ├── SituationInputView.swift
+│   │   └── DurationSelectionView.swift
+│   ├── Session/                 # Meditation experience  
+│   │   ├── MeditationSessionView.swift
+│   │   ├── MeditationCompletionView.swift
+│   │   └── SessionHistoryView.swift
+│   └── Settings/
+│       └── SettingsView.swift
+├── Utils/                       # (Reserved for future utilities)
+└── Assets.xcassets/            # App icons and visual assets
+```
 
 ## Testing Strategy
 
@@ -96,3 +114,4 @@ Key enums define the scientific categorization system:
 - UI tests in `mindfulnessUITests/` 
 - Physical device recommended for testing text-to-speech functionality
 - Test meditation flow with all emotion/situation combinations
+- to memorize

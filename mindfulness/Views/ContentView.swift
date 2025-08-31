@@ -15,6 +15,7 @@ struct ContentView: View {
     
     @State private var showingMeditationFlow = false
     @State private var showingSettings = false
+    @State private var showingSessionHistory = false
     @State private var currentStep: MeditationFlowStep = .emotion
     @State private var selectedEmotion: EmotionCategory?
     @State private var emotionIntensity: Int = 5
@@ -33,7 +34,7 @@ struct ContentView: View {
     }
     
     private var recentSessions: [MeditationSession] {
-        sessions.sorted(by: { $0.timestamp > $1.timestamp }).prefix(5).map { $0 }
+        sessions.sorted(by: { $0.timestamp > $1.timestamp }).prefix(3).map { $0 }
     }
     
     var body: some View {
@@ -141,22 +142,46 @@ struct ContentView: View {
                         .padding(.horizontal)
                     }
                     
-                    // Recent sessions
+                    // Recent sessions card
                     if !recentSessions.isEmpty {
-                        VStack(spacing: 15) {
+                        VStack(spacing: 0) {
+                            // Card header
                             HStack {
                                 Text("Recent Sessions")
                                     .font(.headline)
                                     .fontWeight(.semibold)
+                                
                                 Spacer()
-                            }
-                            
-                            LazyVStack(spacing: 10) {
-                                ForEach(recentSessions, id: \.id) { session in
-                                    SessionCard(session: session)
+                                
+                                Button(action: {
+                                    showingSessionHistory = true
+                                }) {
+                                    HStack(spacing: 4) {
+                                        Text("See All")
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                        
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                    }
+                                    .foregroundColor(.blue)
                                 }
                             }
+                            .padding(.horizontal, 16)
+                            .padding(.top, 16)
+                            .padding(.bottom, 12)
+                            
+                            // Sessions list
+                            LazyVStack(spacing: 8) {
+                                ForEach(recentSessions, id: \.id) { session in
+                                    SessionCard(session: session)
+                                        .padding(.horizontal, 16)
+                                }
+                            }
+                            .padding(.bottom, 16)
                         }
+                        .background(Color(UIColor.systemGray6))
+                        .cornerRadius(16)
                         .padding(.horizontal)
                     }
                     
@@ -173,6 +198,9 @@ struct ContentView: View {
             }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
+            }
+            .sheet(isPresented: $showingSessionHistory) {
+                SessionHistoryView()
             }
         }
     }
@@ -310,7 +338,7 @@ struct SessionCard: View {
         .padding()
         .background(Color(UIColor.systemBackground))
         .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
+        .shadow(color: Color.black.opacity(0.05), radius: 1, x: 0, y: 0.5)
     }
 }
 
