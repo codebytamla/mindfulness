@@ -23,19 +23,18 @@ struct SituationInputView: View {
     ]
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color.green.opacity(0.1),
-                        Color.blue.opacity(0.1)
-                    ]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-                
-                ScrollView {
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.green.opacity(0.1),
+                    Color.blue.opacity(0.1)
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            ScrollView {
                     VStack(spacing: 25) {
                         VStack(spacing: 10) {
                             Text("What's happening?")
@@ -129,8 +128,6 @@ struct SituationInputView: View {
                     }
                 }
             }
-            .navigationBarHidden(true)
-        }
     }
 }
 

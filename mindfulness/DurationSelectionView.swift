@@ -37,19 +37,18 @@ struct DurationSelectionView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color.purple.opacity(0.1),
-                        Color.pink.opacity(0.1)
-                    ]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-                
-                ScrollView {
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.purple.opacity(0.1),
+                    Color.pink.opacity(0.1)
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            ScrollView {
                     VStack(spacing: 30) {
                         VStack(spacing: 10) {
                             Text("How much time do you have?")
@@ -245,8 +244,6 @@ struct DurationSelectionView: View {
                     }
                 }
             }
-            .navigationBarHidden(true)
-        }
     }
 }
 

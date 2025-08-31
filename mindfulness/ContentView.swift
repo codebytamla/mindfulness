@@ -311,50 +311,101 @@ struct MeditationFlowView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        Group {
-            switch currentStep {
-            case .emotion:
-                EmotionSelectionView { emotion, intensity in
-                    selectedEmotion = emotion
-                    emotionIntensity = intensity
-                    currentStep = .situation
+        NavigationView {
+            Group {
+                switch currentStep {
+                case .emotion:
+                    EmotionSelectionView { emotion, intensity in
+                        selectedEmotion = emotion
+                        emotionIntensity = intensity
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            currentStep = .situation
+                        }
+                    }
+                    .navigationBarItems(
+                        leading: Button("Cancel") {
+                            dismiss()
+                        },
+                        trailing: ProgressIndicator(currentStep: 1, totalSteps: 3)
+                    )
+                case .situation:
+                    SituationInputView(
+                        selectedEmotion: selectedEmotion!,
+                        emotionIntensity: emotionIntensity
+                    ) { situation, description in
+                        selectedSituation = situation
+                        situationDescription = description
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            currentStep = .duration
+                        }
+                    }
+                    .navigationBarItems(
+                        leading: Button("Back") {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                currentStep = .emotion
+                            }
+                        },
+                        trailing: ProgressIndicator(currentStep: 2, totalSteps: 3)
+                    )
+                case .duration:
+                    DurationSelectionView(
+                        selectedEmotion: selectedEmotion!,
+                        emotionIntensity: emotionIntensity,
+                        selectedSituation: selectedSituation,
+                        situationDescription: situationDescription
+                    ) { duration in
+                        selectedDuration = duration
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            currentStep = .session
+                        }
+                    }
+                    .navigationBarItems(
+                        leading: Button("Back") {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                currentStep = .situation
+                            }
+                        },
+                        trailing: ProgressIndicator(currentStep: 3, totalSteps: 3)
+                    )
+                case .session:
+                    MeditationSessionView(
+                        emotion: selectedEmotion!,
+                        emotionIntensity: emotionIntensity,
+                        situation: selectedSituation,
+                        situationDescription: situationDescription,
+                        duration: selectedDuration
+                    ) { session in
+                        onComplete(session)
+                        dismiss()
+                    }
+                case .completion:
+                    EmptyView() // Handled by MeditationSessionView
                 }
-            case .situation:
-                SituationInputView(
-                    selectedEmotion: selectedEmotion!,
-                    emotionIntensity: emotionIntensity
-                ) { situation, description in
-                    selectedSituation = situation
-                    situationDescription = description
-                    currentStep = .duration
-                }
-            case .duration:
-                DurationSelectionView(
-                    selectedEmotion: selectedEmotion!,
-                    emotionIntensity: emotionIntensity,
-                    selectedSituation: selectedSituation,
-                    situationDescription: situationDescription
-                ) { duration in
-                    selectedDuration = duration
-                    currentStep = .session
-                }
-            case .session:
-                MeditationSessionView(
-                    emotion: selectedEmotion!,
-                    emotionIntensity: emotionIntensity,
-                    situation: selectedSituation,
-                    situationDescription: situationDescription,
-                    duration: selectedDuration
-                ) { session in
-                    onComplete(session)
-                    dismiss()
-                }
-            case .completion:
-                EmptyView() // Handled by MeditationSessionView
             }
+            .navigationBarHidden(currentStep == .session) // Hide nav bar during meditation
         }
         .onAppear {
             currentStep = .emotion
+        }
+    }
+}
+
+struct ProgressIndicator: View {
+    let currentStep: Int
+    let totalSteps: Int
+    
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(1...totalSteps, id: \.self) { step in
+                Circle()
+                    .fill(step <= currentStep ? Color.blue : Color.gray.opacity(0.3))
+                    .frame(width: 8, height: 8)
+                    .animation(.easeInOut(duration: 0.3), value: currentStep)
+            }
+            
+            Text("\(currentStep)/\(totalSteps)")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
     }
 }

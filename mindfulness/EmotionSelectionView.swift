@@ -20,19 +20,18 @@ struct EmotionSelectionView: View {
     ]
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color.blue.opacity(0.1),
-                        Color.purple.opacity(0.1)
-                    ]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-                
-                ScrollView {
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.blue.opacity(0.1),
+                    Color.purple.opacity(0.1)
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            ScrollView {
                     VStack(spacing: 30) {
                         VStack(spacing: 10) {
                             Text("How are you feeling?")
@@ -116,8 +115,6 @@ struct EmotionSelectionView: View {
                     }
                 }
             }
-            .navigationBarHidden(true)
-        }
     }
 }
 
