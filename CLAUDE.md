@@ -73,10 +73,12 @@ Key enums define the scientific categorization system:
 - 2-second average generation time for complete meditation content
 
 **Navigation Pattern:**
+- `MainContainerView` handles first-time user onboarding vs. main app logic
 - Single `NavigationView` in `ContentView` acts as coordinator
 - State-driven UI transitions using `@State` and `@Environment`
 - Full back navigation support throughout the flow
 - Progressive disclosure: Recent sessions (3 max) on dashboard, full history via "See All"
+- Onboarding persisted via `@AppStorage("hasCompletedOnboarding")`
 
 **Data Persistence:**
 - SwiftData configured in `mindfulnessApp.swift`
@@ -93,7 +95,10 @@ mindfulness/
 ├── Services/
 │   └── MeditationAI.swift        # AI script generation engine
 ├── Views/
+│   ├── MainContainerView.swift   # App entry point with onboarding logic
 │   ├── ContentView.swift         # Main dashboard and navigation coordinator
+│   ├── Onboarding/              # First-time user introduction screens
+│   │   └── OnboardingView.swift
 │   ├── MeditationFlow/          # Meditation creation flow (3-step process)
 │   │   ├── EmotionSelectionView.swift
 │   │   ├── SituationInputView.swift

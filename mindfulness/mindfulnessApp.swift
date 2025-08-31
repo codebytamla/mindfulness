@@ -27,7 +27,7 @@ struct mindfulnessApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainContainerView()
         }
         .modelContainer(sharedModelContainer)
     }
