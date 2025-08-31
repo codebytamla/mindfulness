@@ -9,7 +9,7 @@ import SwiftUI
 
 struct OnboardingView: View {
     @State private var currentPage = 0
-    let onComplete: () -> Void
+    let onComplete: () async -> Void
     
     private let pages: [OnboardingPage] = [
         OnboardingPage(
@@ -51,7 +51,9 @@ struct OnboardingView: View {
                 HStack {
                     Spacer()
                     Button("Skip") {
-                        onComplete()
+                        Task {
+                            await onComplete()
+                        }
                     }
                     .foregroundColor(.white.opacity(0.7))
                     .font(.subheadline)
@@ -104,7 +106,9 @@ struct OnboardingView: View {
                         
                         Button(currentPage == pages.count - 1 ? "Get Started" : "Next") {
                             if currentPage == pages.count - 1 {
-                                onComplete()
+                                Task {
+                                    await onComplete()
+                                }
                             } else {
                                 withAnimation(.easeInOut(duration: 0.3)) {
                                     currentPage += 1

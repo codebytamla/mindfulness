@@ -120,3 +120,4 @@ mindfulness/
 - Physical device recommended for testing text-to-speech functionality
 - Test meditation flow with all emotion/situation combinations
 - to memorize
+- to memorize

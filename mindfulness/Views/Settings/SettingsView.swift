@@ -11,6 +11,7 @@ import StoreKit
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject private var authService: AuthenticationService
     @AppStorage("selectedAppearance") private var selectedAppearance = AppearanceMode.automatic
     @AppStorage("notificationsEnabled") private var notificationsEnabled = true
     @AppStorage("dailyReminderTime") private var dailyReminderTime = Date()
@@ -20,6 +21,7 @@ struct SettingsView: View {
     @State private var showingDeleteAccountAlert = false
     @State private var showingSubscriptionManagement = false
     @State private var showingNotificationPermission = false
+    @State private var showingAccountUpgrade = false
     
     var body: some View {
         NavigationView {
@@ -31,22 +33,22 @@ struct SettingsView: View {
                             .fill(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
                             .frame(width: 50, height: 50)
                             .overlay(
-                                Image(systemName: "person.fill")
+                                Image(systemName: authService.isAnonymousUser ? "person.fill.questionmark" : "person.fill")
                                     .foregroundColor(.white)
                                     .font(.title2)
                             )
                         
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Mindful User")
+                            Text(authService.userDisplayName)
                                 .font(.headline)
                                 .fontWeight(.medium)
                             
-                            if hasProSubscription {
+                            if authService.isAnonymousUser {
                                 HStack {
-                                    Image(systemName: "star.fill")
-                                        .foregroundColor(.yellow)
+                                    Image(systemName: "exclamationmark.circle")
+                                        .foregroundColor(.orange)
                                         .font(.caption)
-                                    Text("Pro Member")
+                                    Text("Anonymous User")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
@@ -60,6 +62,42 @@ struct SettingsView: View {
                         Spacer()
                     }
                     .padding(.vertical, 8)
+                }
+                
+                // Account Section
+                if authService.isAnonymousUser {
+                    Section("Account") {
+                        SettingsRow(
+                            icon: "arrow.up.circle.fill",
+                            iconColor: .blue,
+                            title: "Upgrade Account",
+                            subtitle: "Add email & sync your data across devices"
+                        ) {
+                            showingAccountUpgrade = true
+                        }
+                    }
+                } else {
+                    Section("Account") {
+                        SettingsRow(
+                            icon: "person.circle",
+                            iconColor: .blue,
+                            title: "Account Settings",
+                            subtitle: authService.currentUser?.email ?? "Manage your account"
+                        ) {
+                            // Could add account management here in the future
+                        }
+                        
+                        SettingsRow(
+                            icon: "rectangle.portrait.and.arrow.right",
+                            iconColor: .red,
+                            title: "Sign Out",
+                            subtitle: "Sign out of your account"
+                        ) {
+                            Task {
+                                await authService.signOut()
+                            }
+                        }
+                    }
                 }
                 
                 // Subscription Section
@@ -306,6 +344,10 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showingSubscriptionManagement) {
             SubscriptionManagementView()
+        }
+        .sheet(isPresented: $showingAccountUpgrade) {
+            AccountUpgradeView()
+                .environmentObject(authService)
         }
         .alert("Delete Account", isPresented: $showingDeleteAccountAlert) {
             Button("Cancel", role: .cancel) { }

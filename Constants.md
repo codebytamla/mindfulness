@@ -1,0 +1,6 @@
+Project URL = 
+https://myypqsxmhamgnjjvczgk.supabase.co
+
+API KEY (anon public)=
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15eXBxc3htaGFtZ25qanZjemdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2NTgwMDEsImV4cCI6MjA3MjIzNDAwMX0.jq6pRddnnFuTHBF4dl_FVKfrTWqE0PG-O3veFa75_H8
