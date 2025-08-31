@@ -43,15 +43,22 @@ struct ContentView: View {
                 VStack(spacing: 25) {
                     // Header with settings button
                     HStack {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Mindfulness")
-                                .font(.largeTitle)
-                                .fontWeight(.bold)
-                            
-                            Text("AI-powered guided meditation")
-                                .font(.body)
-                                .foregroundColor(.secondary)
-                        }
+//                        VStack(alignment: .leading, spacing: 10) {
+//                            Text("BeKind")
+//                                .font(.largeTitle)
+//                                .fontWeight(.bold)
+//                            
+//                            Text("AI-powered guided meditation")
+//                                .font(.body)
+//                                .foregroundColor(.secondary)
+//                        }
+                        Text("Sonata")
+                            .font(.largeTitle)
+                            .fontWeight(.medium)
+                            .foregroundColor(.white)
+                            .shadow(color: .teal.opacity(0.5), radius: 8, x: 0, y: 0)
+
+
                         
                         Spacer()
                         
@@ -69,40 +76,11 @@ struct ContentView: View {
                     .padding(.horizontal)
                     .padding(.top, 20)
                     
-                    // Quick start section
+                    // Enhanced CTA section
                     VStack(spacing: 15) {
-                        Button(action: {
+                        PremiumCTAButton(action: {
                             showingMeditationFlow = true
-                        }) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 5) {
-                                    Text("Start New Meditation")
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.white)
-                                    
-                                    Text("Personalized guidance based on how you feel")
-                                        .font(.subheadline)
-                                        .foregroundColor(.white.opacity(0.9))
-                                }
-                                
-                                Spacer()
-                                
-                                Image(systemName: "brain.head.profile")
-                                    .font(.system(size: 30))
-                                    .foregroundColor(.white)
-                            }
-                            .padding(20)
-                            .background(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [Color.blue, Color.purple]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .cornerRadius(16)
-                        }
-                        .buttonStyle(PlainButtonStyle())
+                        })
                     }
                     .padding(.horizontal)
                     
@@ -291,6 +269,31 @@ struct SessionCard: View {
         }
     }
     
+    private var relativeTimeText: String {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        if calendar.isDateInToday(session.timestamp) {
+            let formatter = DateFormatter()
+            formatter.timeStyle = .short
+            return "Today at \(formatter.string(from: session.timestamp))"
+        } else if calendar.isDateInYesterday(session.timestamp) {
+            return "Yesterday"
+        } else {
+            let daysDifference = calendar.dateComponents([.day], from: session.timestamp, to: now).day ?? 0
+            if daysDifference < 7 {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "EEEE" // Day of week
+                return formatter.string(from: session.timestamp)
+            } else {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .none
+                return formatter.string(from: session.timestamp)
+            }
+        }
+    }
+    
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
@@ -318,7 +321,7 @@ struct SessionCard: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
                 
-                Text(session.timestamp, format: Date.FormatStyle(date: .abbreviated, time: .shortened))
+                Text(relativeTimeText)
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
@@ -455,6 +458,93 @@ struct ProgressIndicator: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
+    }
+}
+
+struct PremiumCTAButton: View {
+    let action: () -> Void
+    @State private var isPressed = false
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 8) {
+//                        Image(systemName: "sparkles")
+//                            .font(.system(size: 16, weight: .medium))
+//                            .foregroundColor(.yellow.opacity(0.9))
+                        
+                        Text("Start New Meditation")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                        
+                    }
+                    
+                    Text("AI-powered guidance tailored to your emotions")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.white.opacity(0.35))
+                        .lineLimit(2)
+                }
+                
+                Spacer()
+                
+                ZStack {
+//                    Circle()
+//                        .fill(.white.opacity(0.15))
+//                        .frame(width: 56, height: 56)
+                    
+                    Image(systemName: "moon.stars.fill")
+                        .font(.system(size: 24, weight: .medium))
+                        .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
+                        .symbolEffect(.breathe.pulse.byLayer, options: .repeat(.continuous))
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 20)
+            .background(
+                ZStack {
+                    // Base gradient
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color(red: 0.0, green: 0.4, blue: 1.0),     // Deeper blue
+                            Color(red: 0.3, green: 0.0, blue: 0.8),     // Rich purple  
+                            Color(red: 0.6, green: 0.0, blue: 0.6)      // Magenta accent
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    
+                    // Overlay shimmer effect
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            .clear,
+                            .white.opacity(0.1),
+                            .clear
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                }
+            )
+            .cornerRadius(20)
+            .shadow(
+                color: Color.blue.opacity(0.3),
+                radius: isPressed ? 4 : 12,
+                x: 0,
+                y: isPressed ? 2 : 8
+            )
+            .scaleEffect(isPressed ? 0.98 : 1.0)
+            .animation(.easeInOut(duration: 0.15), value: isPressed)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isPressed = pressing
+            }
+        }, perform: {})
     }
 }
 

@@ -94,7 +94,7 @@ mindfulness/
 │   └── MeditationAI.swift        # AI script generation engine
 ├── Views/
 │   ├── ContentView.swift         # Main dashboard and navigation coordinator
-│   ├── Onboarding/              # Meditation creation flow
+│   ├── MeditationFlow/          # Meditation creation flow (3-step process)
 │   │   ├── EmotionSelectionView.swift
 │   │   ├── SituationInputView.swift
 │   │   └── DurationSelectionView.swift
