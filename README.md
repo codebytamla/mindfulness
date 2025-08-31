@@ -83,6 +83,16 @@ The app is built on three core psychological models:
 - Session history with visual emotion journey mapping
 - Statistical overview (sessions, total minutes, streaks)
 - Personalized recommendations based on user preferences
+- Settings button integration for easy access to account management
+
+#### 8. Settings & Account Management (`SettingsView.swift`)
+- **User Profile**: Visual profile with subscription status display
+- **Subscription Management**: Pro subscription handling and App Store integration
+- **Dark/Light Mode**: Complete theme switching with automatic, light, and dark options
+- **Notification Settings**: Meditation reminders with customizable times and streak alerts
+- **Account Deletion**: Apple-required account deletion with data export options
+- **Support & Legal**: Privacy policy, terms of service, help contact, and app reviews
+- **App Information**: Version details and build information
 
 ## 🎨 User Experience Design
 
@@ -123,6 +133,7 @@ mindfulness/
 ├── MeditationAI.swift             # AI script generation engine
 ├── MeditationSessionView.swift     # Audio player and session UI
 ├── MeditationCompletionView.swift  # Post-session reflection
+├── SettingsView.swift             # Settings and account management
 ├── ContentView.swift              # Main dashboard and flow coordination
 ├── mindfulnessApp.swift           # App entry point and data setup
 └── Assets.xcassets               # App icons and visual assets
@@ -154,6 +165,7 @@ open mindfulness.xcodeproj
 
 ## 📊 User Flow
 
+### Main Flow
 1. **Dashboard**: View progress, stats, and start new meditation
 2. **Emotion Selection**: Choose current emotional state (8 options) with intensity
 3. **Situation Context** (optional): Select life situation or skip
@@ -162,6 +174,15 @@ open mindfulness.xcodeproj
 6. **Meditation Session**: Text-to-speech guided meditation with timer
 7. **Completion Reflection**: Rate session, check mood shift, optional notes
 8. **Progress Update**: Stats updated, streaks calculated, preferences learned
+
+### Settings Flow
+1. **Access**: Tap gear icon on dashboard to open settings
+2. **Profile Management**: View subscription status and account details
+3. **Theme Selection**: Choose between light, dark, or automatic appearance
+4. **Notifications**: Configure meditation reminders and streak alerts
+5. **Subscription**: Manage Pro subscription or upgrade from free plan
+6. **Account Actions**: Export data, delete account, or contact support
+7. **Legal**: Access privacy policy, terms of service, and app review options
 
 ## 🔧 Customization & Extensions
 

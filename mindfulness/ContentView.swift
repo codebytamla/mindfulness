@@ -14,6 +14,7 @@ struct ContentView: View {
     @Query private var userProfiles: [UserProfile]
     
     @State private var showingMeditationFlow = false
+    @State private var showingSettings = false
     @State private var currentStep: MeditationFlowStep = .emotion
     @State private var selectedEmotion: EmotionCategory?
     @State private var emotionIntensity: Int = 5
@@ -39,16 +40,32 @@ struct ContentView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 25) {
-                    // Header
-                    VStack(spacing: 10) {
-                        Text("Mindfulness")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
+                    // Header with settings button
+                    HStack {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Mindfulness")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                            
+                            Text("AI-powered guided meditation")
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                        }
                         
-                        Text("AI-powered guided meditation")
-                            .font(.body)
-                            .foregroundColor(.secondary)
+                        Spacer()
+                        
+                        Button(action: {
+                            showingSettings = true
+                        }) {
+                            Image(systemName: "gearshape.fill")
+                                .font(.title2)
+                                .foregroundColor(.gray)
+                                .frame(width: 44, height: 44)
+                                .background(Color(UIColor.systemGray6))
+                                .clipShape(Circle())
+                        }
                     }
+                    .padding(.horizontal)
                     .padding(.top, 20)
                     
                     // Quick start section
@@ -153,6 +170,9 @@ struct ContentView: View {
                     updateUserProfile(with: session)
                     showingMeditationFlow = false
                 }
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView()
             }
         }
     }
