@@ -343,6 +343,6 @@ struct PostMoodCard: View {
         duration: 10,
         meditationType: .breathwork
     ) { rating, mood, notes in
-        print("Rating: \(rating), Mood: \(mood), Notes: \(notes)")
+        print("Rating: \(rating ?? -1), Mood: \(mood?.rawValue ?? "none"), Notes: \(notes ?? "no notes")")
     }
 }

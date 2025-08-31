@@ -359,7 +359,11 @@ struct SettingsView: View {
     
     private func requestAppStoreReview() {
         if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
-            SKStoreReviewController.requestReview(in: scene)
+            if #available(iOS 18.0, *) {
+                AppStore.requestReview(in: scene)
+            } else {
+                SKStoreReviewController.requestReview(in: scene)
+            }
         }
     }
     
@@ -461,7 +465,7 @@ struct SettingsToggle: View {
             Spacer()
             
             Toggle("", isOn: $isOn)
-                .onChange(of: isOn) { _ in
+                .onChange(of: isOn) {
                     onChange?()
                 }
         }

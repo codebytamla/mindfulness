@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import AVFoundation
 
 struct MeditationSessionView: View {
     let emotion: EmotionCategory
@@ -16,7 +15,6 @@ struct MeditationSessionView: View {
     let duration: Int
     
     @StateObject private var meditationAI = MeditationAI()
-    @StateObject private var speechSynthesizer = MeditationSpeechSynthesizer()
     
     @State private var isGenerating = true
     @State private var meditationScript = ""
@@ -49,7 +47,7 @@ struct MeditationSessionView: View {
         }
         .onDisappear {
             timer?.invalidate()
-            speechSynthesizer.stopSpeaking()
+            // TODO: Stop backend audio
         }
         .sheet(isPresented: $showingCompletion) {
             MeditationCompletionView(
@@ -179,20 +177,15 @@ struct MeditationSessionView: View {
             // Audio controls
             HStack(spacing: 40) {
                 Button(action: {
-                    if speechSynthesizer.isSpeaking {
-                        speechSynthesizer.pauseSpeaking()
-                    } else {
-                        speechSynthesizer.resumeSpeaking()
-                    }
+                    // TODO: Implement backend audio play/pause
                 }) {
-                    Image(systemName: speechSynthesizer.isSpeaking ? "pause.circle.fill" : "play.circle.fill")
+                    Image(systemName: "play.circle.fill")
                         .font(.system(size: 50))
                         .foregroundColor(.white)
                 }
-                .disabled(!speechSynthesizer.canSpeak)
                 
                 Button(action: {
-                    speechSynthesizer.stopSpeaking()
+                    // TODO: Stop backend audio
                     timer?.invalidate()
                     showingCompletion = true
                 }) {
@@ -208,17 +201,7 @@ struct MeditationSessionView: View {
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.6))
                 
-                if speechSynthesizer.isSpeaking {
-                    HStack(spacing: 4) {
-                        ForEach(0..<3, id: \.self) { index in
-                            Circle()
-                                .fill(.white.opacity(0.7))
-                                .frame(width: 6, height: 6)
-                                .scaleEffect(speechSynthesizer.isSpeaking ? 1.0 : 0.5)
-                                .animation(.easeInOut(duration: 0.6).repeatForever().delay(Double(index) * 0.2), value: speechSynthesizer.isSpeaking)
-                        }
-                    }
-                }
+                // TODO: Add audio playing indicator for backend audio
             }
             
             Spacer()
@@ -249,8 +232,7 @@ struct MeditationSessionView: View {
     private func startMeditation() {
         guard !isGenerating else { return }
         
-        // Start text-to-speech
-        speechSynthesizer.speak(text: meditationScript)
+        // TODO: Start backend audio playback
         
         // Start timer
         isActive = true
@@ -259,7 +241,7 @@ struct MeditationSessionView: View {
                 timeRemaining -= 1
             } else {
                 timer?.invalidate()
-                speechSynthesizer.stopSpeaking()
+                // TODO: Stop backend audio
                 showingCompletion = true
             }
         }
@@ -293,82 +275,7 @@ struct MeditationSessionView: View {
     }
 }
 
-// Text-to-Speech Handler
-class MeditationSpeechSynthesizer: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
-    private let synthesizer = AVSpeechSynthesizer()
-    
-    @Published var isSpeaking = false
-    @Published var canSpeak = true
-    
-    override init() {
-        super.init()
-        synthesizer.delegate = self
-        setupAudioSession()
-    }
-    
-    private func setupAudioSession() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("Failed to setup audio session: \(error)")
-            canSpeak = false
-        }
-    }
-    
-    func speak(text: String) {
-        guard canSpeak else { return }
-        
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-        utterance.rate = 0.4 // Slower rate for meditation
-        utterance.pitchMultiplier = 0.9 // Slightly lower pitch for calming effect
-        utterance.volume = 0.8
-        
-        synthesizer.speak(utterance)
-    }
-    
-    func pauseSpeaking() {
-        synthesizer.pauseSpeaking(at: .immediate)
-        isSpeaking = false
-    }
-    
-    func resumeSpeaking() {
-        synthesizer.continueSpeaking()
-        isSpeaking = true
-    }
-    
-    func stopSpeaking() {
-        synthesizer.stopSpeaking(at: .immediate)
-        isSpeaking = false
-    }
-    
-    // MARK: - AVSpeechSynthesizerDelegate
-    
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didStart utterance: AVSpeechUtterance) {
-        DispatchQueue.main.async {
-            self.isSpeaking = true
-        }
-    }
-    
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        DispatchQueue.main.async {
-            self.isSpeaking = false
-        }
-    }
-    
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didPause utterance: AVSpeechUtterance) {
-        DispatchQueue.main.async {
-            self.isSpeaking = false
-        }
-    }
-    
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didContinue utterance: AVSpeechUtterance) {
-        DispatchQueue.main.async {
-            self.isSpeaking = true
-        }
-    }
-}
+// TODO: Backend audio player will replace TTS functionality
 
 #Preview {
     MeditationSessionView(
