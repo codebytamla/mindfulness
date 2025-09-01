@@ -155,7 +155,7 @@ struct SessionGroupView: View {
                 .padding(.horizontal, 4)
             
             ForEach(sessions, id: \.id) { session in
-                SessionCard(session: session)
+                JourneyMemoryCard(session: session)
             }
         }
     }
