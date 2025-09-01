@@ -65,6 +65,78 @@ class AuthenticationService: ObservableObject {
         self.authError = nil
     }
     
+    // MARK: - Apple Sign In
+    
+    func signInWithApple(
+        userIdentifier: String,
+        email: String?,
+        fullName: PersonNameComponents?,
+        identityToken: String?,
+        authorizationCode: String?
+    ) async -> Result<User, AuthError> {
+        isLoading = true
+        authError = nil
+        
+        do {
+            let session: Session
+            
+            #if targetEnvironment(simulator)
+            // For simulator, use anonymous auth instead of Apple Sign In JWT
+            print("Using anonymous auth for simulator Apple Sign In mock")
+            session = try await supabase.auth.signInAnonymously()
+            #else
+            // For real device, use Apple Sign In with JWT
+            guard let identityToken = identityToken else {
+                let error = AuthError.invalidCredentials
+                self.authError = error
+                isLoading = false
+                return .failure(error)
+            }
+            
+            session = try await supabase.auth.signInWithIdToken(
+                credentials: .init(
+                    provider: .apple,
+                    idToken: identityToken
+                )
+            )
+            #endif
+            
+            let user = session.user
+            
+            // Update user metadata with Apple information
+            if let email = email, let fullName = fullName {
+                try await supabase.auth.update(
+                    user: UserAttributes(
+                        data: [
+                            "provider": .string("apple"),
+                            "apple_user_id": .string(userIdentifier),
+                            "display_name": .string(fullName.formatted(.name(style: .long))),
+                            "first_name": .string(fullName.givenName ?? ""),
+                            "last_name": .string(fullName.familyName ?? ""),
+                            "email": .string(email)
+                        ]
+                    )
+                )
+            }
+            
+            // Create initial user profile data
+            await createInitialUserProfile(for: user)
+            
+            isLoading = false
+            return .success(user)
+            
+        } catch let error as AuthError {
+            isLoading = false
+            self.authError = error
+            return .failure(error)
+        } catch {
+            isLoading = false
+            let authError = AuthError.unknown(error.localizedDescription)
+            self.authError = authError
+            return .failure(authError)
+        }
+    }
+    
     // MARK: - Anonymous Authentication
     
     func signInAnonymously() async -> Result<User, AuthError> {
@@ -87,14 +159,12 @@ class AuthenticationService: ObservableObject {
             self.authError = authError
             return .failure(authError)
         }
-        
-        self.isLoading = false
     }
     
     // MARK: - Account Upgrade
     
     func upgradeAccount(email: String, password: String, displayName: String) async -> Result<User, AuthError> {
-        guard let currentUser = currentUser else {
+        guard currentUser != nil else {
             let error = AuthError.notAuthenticated
             self.authError = error
             return .failure(error)
@@ -193,12 +263,18 @@ class AuthenticationService: ObservableObject {
             return displayName
         }
         
+        // Check first name from Apple Sign In
+        if let firstName = user.userMetadata["first_name"]?.stringValue,
+           !firstName.isEmpty {
+            return firstName
+        }
+        
         // Fallback to email if available
         if let email = user.email, !email.isEmpty {
             return email
         }
         
-        return "Anonymous User"
+        return "User"
     }
     
     func refreshSession() async {

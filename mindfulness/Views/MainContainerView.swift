@@ -9,12 +9,17 @@ import SwiftUI
 
 struct MainContainerView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @AppStorage("hasSignedInWithApple") private var hasSignedInWithApple = false
     @StateObject private var authService = AuthenticationService.shared
     @State private var isAuthenticating = false
     
     var body: some View {
         Group {
-            if !hasCompletedOnboarding {
+            if !hasSignedInWithApple {
+                AppleSignInView {
+                    hasSignedInWithApple = true
+                }
+            } else if !hasCompletedOnboarding {
                 OnboardingView {
                     await completeOnboarding()
                 }
@@ -32,6 +37,7 @@ struct MainContainerView: View {
                     }
             }
         }
+        .animation(.easeInOut(duration: 0.5), value: hasSignedInWithApple)
         .animation(.easeInOut(duration: 0.5), value: hasCompletedOnboarding)
         .animation(.easeInOut(duration: 0.3), value: authService.isAuthenticated)
     }
@@ -39,34 +45,15 @@ struct MainContainerView: View {
     @MainActor
     private func completeOnboarding() async {
         hasCompletedOnboarding = true
-        isAuthenticating = true
-        
-        let result = await authService.signInAnonymously()
-        
-        switch result {
-        case .success(let user):
-            print("✅ Anonymous authentication successful for user: \(user.id)")
-        case .failure(let error):
-            print("❌ Anonymous authentication failed: \(error.localizedDescription)")
-            // Continue anyway - user can still use the app offline
-        }
-        
-        isAuthenticating = false
     }
     
     @MainActor
     private func retryAuthentication() async {
-        isAuthenticating = true
-        
-        let result = await authService.signInAnonymously()
-        
-        switch result {
-        case .success(let user):
-            print("✅ Retry authentication successful for user: \(user.id)")
-        case .failure(let error):
-            print("❌ Retry authentication failed: \(error.localizedDescription)")
+        // Check for existing session - Apple Sign In should be persistent
+        if authService.currentUser == nil {
+            // If no user, redirect back to Apple Sign In
+            hasSignedInWithApple = false
         }
-        
         isAuthenticating = false
     }
 }
