@@ -10,6 +10,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.colorScheme) var colorScheme
     @Query private var sessions: [MeditationSession]
     @Query private var userProfiles: [UserProfile]
     
@@ -95,8 +96,13 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 25) {
+            ZStack {
+                // Subtle flowing background
+                FlowingBackground()
+                
+                GeometryReader { geometry in
+                    ScrollView {
+                        VStack(spacing: adaptiveSpacing(for: geometry.size.height)) {
                     // Header with settings button
                     HStack {
                
@@ -115,10 +121,10 @@ struct ContentView: View {
                         }
                     }
                     .padding(.horizontal)
-                    .padding(.top, 20)
+                    .padding(.top, adaptiveTopPadding(for: geometry.size.height))
                     
                     // Enhanced CTA section with headlines
-                    VStack(spacing: 20) {
+                    VStack(spacing: 24) {
                         VStack(spacing: 12) {
 //                            Text(dynamicHeadline)
 //                                .font(.system(.largeTitle, design: .rounded, weight: .bold))
@@ -132,7 +138,7 @@ struct ContentView: View {
 //                                )
 //                                .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
                             Text(dynamicHeadline)
-                                .font(.custom("Noteworthy-Bold", size: 34)) // try "Noteworthy" or "Noteworthy-Bold"
+                                .font(.custom("Noteworthy-Bold", size: 34))
                                 .multilineTextAlignment(.center)
                                 .foregroundStyle(
                                     LinearGradient(
@@ -141,7 +147,7 @@ struct ContentView: View {
                                         endPoint: .bottomTrailing
                                     )
                                 )
-                                .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+                                .shadow(color: Color.primary.opacity(0.1), radius: 2, x: 0, y: 1)
 
                             
                             Text(dynamicSubheadline)
@@ -163,7 +169,7 @@ struct ContentView: View {
                     
                     // Stats section
                     if !sessions.isEmpty {
-                        VStack(spacing: 15) {
+                        VStack(spacing: 18) {
                             HStack {
                                 Text("Your Progress")
                                     .font(.headline)
@@ -171,7 +177,7 @@ struct ContentView: View {
                                 Spacer()
                             }
                             
-                            HStack(spacing: 15) {
+                            HStack(spacing: 12) {
                                 StatCard(
                                     title: "Total Sessions",
                                     value: "\(sessions.count)",
@@ -235,12 +241,26 @@ struct ContentView: View {
                             }
                             .padding(.bottom, 16)
                         }
-                        .background(Color(UIColor.systemGray6))
+                        .background(
+                            colorScheme == .dark 
+                                ? Color(UIColor.secondarySystemGroupedBackground)
+                                : Color.white.opacity(0.9)
+                        )
                         .cornerRadius(16)
+                        .shadow(
+                            color: colorScheme == .dark 
+                                ? Color.clear 
+                                : Color.black.opacity(0.08),
+                            radius: 8,
+                            x: 0,
+                            y: 2
+                        )
                         .padding(.horizontal)
                     }
                     
-                    Spacer(minLength: 50)
+                        Spacer(minLength: adaptiveBottomSpacing(for: geometry.size.height))
+                    }
+                }
                 }
             }
             .navigationBarHidden(true)
@@ -257,6 +277,41 @@ struct ContentView: View {
             .sheet(isPresented: $showingSessionHistory) {
                 SessionHistoryView()
             }
+        }
+    }
+    
+    private func adaptiveSpacing(for height: CGFloat) -> CGFloat {
+        switch height {
+        case 0..<700:    // iPhone SE, iPhone 12/13/14/15 mini
+            return 25
+        case 700..<850:  // iPhone 12/13/14/15 standard
+            return 32
+        case 850..<950:  // iPhone 12/13/14/15 Pro Max, iPhone 15 Plus
+            return 38
+        default:         // Larger screens, iPad
+            return 42
+        }
+    }
+    
+    private func adaptiveBottomSpacing(for height: CGFloat) -> CGFloat {
+        switch height {
+        case 0..<700:    // Smaller screens
+            return 20
+        case 700..<850:  // Standard screens  
+            return 25
+        default:         // Larger screens
+            return 30
+        }
+    }
+    
+    private func adaptiveTopPadding(for height: CGFloat) -> CGFloat {
+        switch height {
+        case 0..<700:    // iPhone SE, smaller screens
+            return 15
+        case 700..<850:  // Standard iPhones
+            return 25
+        default:         // Larger screens
+            return 30
         }
     }
     
@@ -307,6 +362,7 @@ struct ContentView: View {
 }
 
 struct StatCard: View {
+    @Environment(\.colorScheme) var colorScheme
     let title: String
     let value: String
     let icon: String
@@ -329,12 +385,25 @@ struct StatCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color(UIColor.systemGray6))
+        .background(
+            colorScheme == .dark 
+                ? Color(UIColor.secondarySystemGroupedBackground)
+                : Color.white.opacity(0.95)
+        )
         .cornerRadius(12)
+        .shadow(
+            color: colorScheme == .dark 
+                ? Color.clear 
+                : Color.black.opacity(0.06),
+            radius: 4,
+            x: 0,
+            y: 1
+        )
     }
 }
 
 struct SessionCard: View {
+    @Environment(\.colorScheme) var colorScheme
     let session: MeditationSession
     
     private var emotionColor: Color {
@@ -416,9 +485,20 @@ struct SessionCard: View {
             }
         }
         .padding()
-        .background(Color(UIColor.systemBackground))
+        .background(
+            colorScheme == .dark 
+                ? Color(UIColor.systemBackground)
+                : Color.white.opacity(0.98)
+        )
         .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.05), radius: 1, x: 0, y: 0.5)
+        .shadow(
+            color: colorScheme == .dark 
+                ? Color.primary.opacity(0.1) 
+                : Color.black.opacity(0.08),
+            radius: colorScheme == .dark ? 1 : 3,
+            x: 0,
+            y: colorScheme == .dark ? 0.5 : 1
+        )
     }
 }
 
@@ -538,6 +618,110 @@ struct ProgressIndicator: View {
     }
 }
 
+struct FlowingBackground: View {
+    @Environment(\.colorScheme) var colorScheme
+    @State private var animationOffset: CGFloat = 0
+    @State private var particleAnimation: Bool = false
+    
+    var body: some View {
+        ZStack {
+            // Adaptive base background
+            (colorScheme == .dark ? Color.black : Color.gray.opacity(0.05))
+                .ignoresSafeArea()
+            
+            // Subtle flowing gradient that adapts to color scheme
+            LinearGradient(
+                gradient: Gradient(colors: gradientColors),
+                startPoint: UnitPoint(x: 0, y: animationOffset),
+                endPoint: UnitPoint(x: 1, y: 1 - animationOffset)
+            )
+            .ignoresSafeArea()
+            .animation(.easeInOut(duration: 8).repeatForever(autoreverses: true), value: animationOffset)
+            
+            // Subtle particles that adapt to theme
+            ForEach(0..<6, id: \.self) { index in
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            gradient: Gradient(colors: particleGradientColors),
+                            center: .center,
+                            startRadius: 1,
+                            endRadius: 30
+                        )
+                    )
+                    .frame(width: CGFloat.random(in: 40...80), height: CGFloat.random(in: 40...80))
+                    .position(
+                        x: CGFloat.random(in: 0...UIScreen.main.bounds.width),
+                        y: CGFloat.random(in: 0...UIScreen.main.bounds.height) + (particleAnimation ? 50 : -50)
+                    )
+                    .opacity(particleAnimation ? particleOpacity : particleOpacity * 0.3)
+                    .animation(
+                        .easeInOut(duration: Double.random(in: 6...12))
+                        .repeatForever(autoreverses: true)
+                        .delay(Double(index) * 0.8),
+                        value: particleAnimation
+                    )
+            }
+            
+            // Subtle mesh overlay
+            Rectangle()
+                .fill(
+                    RadialGradient(
+                        gradient: Gradient(colors: meshGradientColors),
+                        center: .center,
+                        startRadius: 100,
+                        endRadius: 400
+                    )
+                )
+                .ignoresSafeArea()
+                .scaleEffect(particleAnimation ? 1.1 : 0.9)
+                .animation(.easeInOut(duration: 10).repeatForever(autoreverses: true), value: particleAnimation)
+        }
+        .onAppear {
+            animationOffset = 0.3
+            particleAnimation = true
+        }
+    }
+    
+    private var gradientColors: [Color] {
+        if colorScheme == .dark {
+            return [
+                Color.black,
+                Color.gray.opacity(0.03),
+                Color.blue.opacity(0.02),
+                Color.black
+            ]
+        } else {
+            return [
+                Color.gray.opacity(0.08),
+                Color.gray.opacity(0.12),
+                Color.blue.opacity(0.06),
+                Color.gray.opacity(0.08)
+            ]
+        }
+    }
+    
+    private var particleGradientColors: [Color] {
+        if colorScheme == .dark {
+            return [Color.white.opacity(0.01), Color.clear]
+        } else {
+            return [Color.gray.opacity(0.02), Color.clear]
+        }
+    }
+    
+    private var meshGradientColors: [Color] {
+        if colorScheme == .dark {
+            return [Color.clear, Color.gray.opacity(0.005), Color.clear]
+        } else {
+            return [Color.clear, Color.gray.opacity(0.01), Color.clear]
+        }
+    }
+    
+    private var particleOpacity: Double {
+        colorScheme == .dark ? 0.3 : 0.15
+    }
+}
+
 struct PremiumCTAButton: View {
     let buttonText: String
     let action: () -> Void
@@ -548,25 +732,17 @@ struct PremiumCTAButton: View {
             HStack(spacing: 16) {
                 Spacer()
                 
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "sparkles")
-                            .font(.system(size: 24, weight: .medium))
-                            .foregroundColor(.white)
-                            .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
-                        
-                        Text(buttonText)
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                        
-                    }
+                HStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 24, weight: .medium))
+                        .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
                     
-//                    Text("AI-powered guidance tailored to your emotions")
-//                        .font(.subheadline)
-//                        .fontWeight(.medium)
-//                        .foregroundColor(.white.opacity(0.35))
-//                        .lineLimit(2)
+                    Text(buttonText)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                    
                 }
                 
                 Spacer()
