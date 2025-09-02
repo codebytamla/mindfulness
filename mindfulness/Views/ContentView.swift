@@ -44,7 +44,7 @@ struct ContentView: View {
         
         if sessions.isEmpty {
             // New users get welcome message
-            return "Welcome to Mindflow"
+            return "Riverflow"
         } else if streak > 0 {
             return streak == 1 ? "Keep Going! 🔥" : "\(streak)-Day Streak! 🔥"
         } else {
@@ -67,7 +67,7 @@ struct ContentView: View {
         let totalMinutes = sessions.reduce(0) { $0 + $1.duration }
         
         if sessions.isEmpty {
-            return "Start your mindfulness journey with a personalized meditation"
+            return "Discover meditation that adapts to you"
         } else if let lastSession = sessions.last,
                   calendar.isDateInToday(lastSession.timestamp) {
             return "You've already meditated today. Ready for another session?"
@@ -77,6 +77,19 @@ struct ContentView: View {
             return "You've meditated for \(totalMinutes) minutes total. Amazing progress!"
         } else {
             return "Over \(totalMinutes) minutes of mindfulness. You're a meditation master!"
+        }
+    }
+    
+    private var dynamicButtonText: String {
+        let calendar = Calendar.current
+        
+        if sessions.isEmpty {
+            return "Begin Your Journey"
+        } else if let lastSession = sessions.last,
+                  calendar.isDateInToday(lastSession.timestamp) {
+            return "Continue Today"
+        } else {
+            return "Start Today's Session"
         }
     }
     
@@ -139,9 +152,12 @@ struct ContentView: View {
                                 .padding(.horizontal, 8)
                         }
                         
-                        PremiumCTAButton(action: {
-                            showingMeditationFlow = true
-                        })
+                        PremiumCTAButton(
+                            buttonText: dynamicButtonText,
+                            action: {
+                                showingMeditationFlow = true
+                            }
+                        )
                     }
                     .padding(.horizontal)
                     
@@ -523,6 +539,7 @@ struct ProgressIndicator: View {
 }
 
 struct PremiumCTAButton: View {
+    let buttonText: String
     let action: () -> Void
     @State private var isPressed = false
     
@@ -538,7 +555,7 @@ struct PremiumCTAButton: View {
                             .foregroundColor(.white)
                             .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
                         
-                        Text("Start New Meditation")
+                        Text(buttonText)
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
