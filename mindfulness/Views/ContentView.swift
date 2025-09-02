@@ -37,6 +37,49 @@ struct ContentView: View {
         sessions.sorted(by: { $0.timestamp > $1.timestamp }).prefix(3).map { $0 }
     }
     
+    private var dynamicHeadline: String {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: Date())
+        let streak = calculateStreak()
+        
+        if sessions.isEmpty {
+            // New users get welcome message
+            return "Welcome to Mindflow"
+        } else if streak > 0 {
+            return streak == 1 ? "Keep Going! 🔥" : "\(streak)-Day Streak! 🔥"
+        } else {
+            // Returning users get time-based greetings
+            switch hour {
+            case 5..<12:
+                return "Good Morning 🌅"
+            case 12..<17:
+                return "Good Afternoon ☀️"
+            case 17..<21:
+                return "Good Evening 🌆"
+            default:
+                return "Good Night 🌙"
+            }
+        }
+    }
+    
+    private var dynamicSubheadline: String {
+        let calendar = Calendar.current
+        let totalMinutes = sessions.reduce(0) { $0 + $1.duration }
+        
+        if sessions.isEmpty {
+            return "Start your mindfulness journey with a personalized meditation"
+        } else if let lastSession = sessions.last,
+                  calendar.isDateInToday(lastSession.timestamp) {
+            return "You've already meditated today. Ready for another session?"
+        } else if totalMinutes < 60 {
+            return "You're building a great foundation. Keep it up!"
+        } else if totalMinutes < 300 {
+            return "You've meditated for \(totalMinutes) minutes total. Amazing progress!"
+        } else {
+            return "Over \(totalMinutes) minutes of mindfulness. You're a meditation master!"
+        }
+    }
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -49,19 +92,53 @@ struct ContentView: View {
                         Button(action: {
                             showingSettings = true
                         }) {
-                            Image(systemName: "person.fill")
+                            Image(systemName: "line.3.horizontal.decrease")
                                 .font(.title2)
                                 .foregroundColor(.gray)
                                 .frame(width: 44, height: 44)
-                                .background(Color(UIColor.systemGray6))
-                                .clipShape(Circle())
+                            //    .background(Color(UIColor.systemGray6))
+                            //    .clipShape(Circle())
+
                         }
                     }
                     .padding(.horizontal)
                     .padding(.top, 20)
                     
-                    // Enhanced CTA section
-                    VStack(spacing: 15) {
+                    // Enhanced CTA section with headlines
+                    VStack(spacing: 20) {
+                        VStack(spacing: 12) {
+//                            Text(dynamicHeadline)
+//                                .font(.system(.largeTitle, design: .rounded, weight: .bold))
+//                                .multilineTextAlignment(.center)
+//                                .foregroundStyle(
+//                                    LinearGradient(
+//                                        colors: [.primary, .primary.opacity(0.8)],
+//                                        startPoint: .topLeading,
+//                                        endPoint: .bottomTrailing
+//                                    )
+//                                )
+//                                .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+                            Text(dynamicHeadline)
+                                .font(.custom("Noteworthy-Bold", size: 34)) // try "Noteworthy" or "Noteworthy-Bold"
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [.primary, .primary.opacity(0.8)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+
+                            
+                            Text(dynamicSubheadline)
+                                .font(.system(.callout, design: .rounded, weight: .medium))
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(.secondary)
+                                .lineSpacing(2)
+                                .padding(.horizontal, 8)
+                        }
+                        
                         PremiumCTAButton(action: {
                             showingMeditationFlow = true
                         })
