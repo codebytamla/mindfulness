@@ -97,8 +97,8 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // Subtle flowing background
-                FlowingBackground()
+                // Animated meditation background
+                MeditationAnimatedBackground()
                 
                 GeometryReader { geometry in
                     ScrollView {
@@ -762,9 +762,9 @@ struct PremiumCTAButton: View {
                     // Base gradient
                     LinearGradient(
                         gradient: Gradient(colors: [
-                            Color(red: 0.0, green: 0.4, blue: 1.0),     // Deeper blue
-                            Color(red: 0.3, green: 0.0, blue: 0.8),     // Rich purple  
-                            Color(red: 0.6, green: 0.0, blue: 0.6)      // Magenta accent
+                            Color(red: 0.0, green: 0.5, blue: 1.0),     // Calm blue
+                            Color(red: 0.0, green: 0.7, blue: 0.9),     // Teal transition  
+                            Color(red: 0.0, green: 0.8, blue: 0.4)      // Peaceful green
                         ]),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -784,7 +784,7 @@ struct PremiumCTAButton: View {
             )
             .cornerRadius(20)
             .shadow(
-                color: Color.blue.opacity(0.3),
+                color: Color.green.opacity(0.25),
                 radius: isPressed ? 4 : 12,
                 x: 0,
                 y: isPressed ? 2 : 8
