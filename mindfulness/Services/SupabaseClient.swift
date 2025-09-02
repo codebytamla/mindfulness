@@ -26,6 +26,7 @@ class SupabaseManager {
                     schema: "public"
                 ),
                 auth: SupabaseClientOptions.AuthOptions(
+                    flowType: .pkce,
                     autoRefreshToken: true
                 ),
                 global: SupabaseClientOptions.GlobalOptions(

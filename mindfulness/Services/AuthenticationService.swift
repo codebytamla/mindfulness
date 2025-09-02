@@ -35,9 +35,10 @@ class AuthenticationService: ObservableObject {
     private func checkExistingSession() async {
         do {
             let session = try await supabase.auth.session
+            print("✅ Found existing session for user: \(session.user.id.uuidString)")
             updateAuthState(user: session.user, isAuthenticated: true)
         } catch {
-            print("No existing session found: \(error)")
+            print("❌ No existing session found: \(error)")
             updateAuthState(user: nil, isAuthenticated: false)
         }
     }
@@ -45,14 +46,19 @@ class AuthenticationService: ObservableObject {
     private func setupAuthStateListener() {
         Task {
             for await state in supabase.auth.authStateChanges {
+                print("🔐 Auth state changed: \(state.event)")
                 switch state.event {
                 case .signedIn:
+                    print("✅ User signed in: \(state.session?.user.id.uuidString ?? "unknown")")
                     updateAuthState(user: state.session?.user, isAuthenticated: true)
                 case .signedOut:
+                    print("❌ User signed out")
                     updateAuthState(user: nil, isAuthenticated: false)
                 case .tokenRefreshed:
+                    print("🔄 Token refreshed for user: \(state.session?.user.id.uuidString ?? "unknown")")
                     updateAuthState(user: state.session?.user, isAuthenticated: true)
                 default:
+                    print("🔐 Other auth event: \(state.event)")
                     break
                 }
             }
@@ -209,7 +215,7 @@ class AuthenticationService: ObservableObject {
     private func createInitialUserProfile(for user: User) async {
         // This would typically involve creating a user profile in your database
         // For now, we'll just log the creation
-        print("Created initial profile for user: \(user.id)")
+        print("Created initial profile for user: \(user.id.uuidString)")
         
         // You could extend this to create a UserProfile record in SwiftData
         // or sync with a Supabase table for user profiles
@@ -219,7 +225,7 @@ class AuthenticationService: ObservableObject {
         guard let currentUser = currentUser else { return }
         
         // Update user profile with new information
-        print("Updated profile for user \(currentUser.id): \(displayName), \(email)")
+        print("Updated profile for user \(currentUser.id.uuidString): \(displayName), \(email)")
         
         // Extend this to update your SwiftData UserProfile model
         // or sync with Supabase user profiles table

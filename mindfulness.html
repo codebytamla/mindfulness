@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful - Welcome</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #f8f9ff 0%, #e8edff 100%);
+            border-radius: 32px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 30px 60px;
+            text-align: center;
+        }
+
+        .logo-area {
+            margin-bottom: 40px;
+        }
+
+        .meditation-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .meditation-icon::before {
+            content: "🧘‍♀️";
+            font-size: 40px;
+        }
+
+        .app-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            font-size: 18px;
+            color: #6b7280;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #9ca3af;
+            line-height: 1.4;
+        }
+
+        .buttons {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 50px;
+        }
+
+        .creator-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px 24px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .creator-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .creator-btn:hover::before {
+            left: 100%;
+        }
+
+        .creator-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .creator-label {
+            font-size: 15px;
+            margin-bottom: 4px;
+            opacity: 0.9;
+        }
+
+        .creator-main {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .apple-btn {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .apple-btn:hover {
+            background: #2a2a2a;
+            transform: translateY(-1px);
+        }
+
+        .apple-logo {
+            width: 20px;
+            height: 20px;
+        }
+
+        .footer-text {
+            margin-top: 30px;
+            font-size: 13px;
+            color: #9ca3af;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 400px) {
+            .phone-frame {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+            
+            .screen {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>100%</span>
+            </div>
+            
+            <div class="content">
+                <div class="logo-area">
+                    <div class="meditation-icon"></div>
+                    <h1 class="app-name">Mindful</h1>
+                    <p class="tagline">Find your inner peace</p>
+                    <p class="subtitle">AI-powered personalized meditation<br>for every mood and moment</p>
+                </div>
+
+                <div class="buttons">
+                    <button class="creator-btn">
+                        <div class="creator-label">I have a creator code</div>
+                        <div class="creator-main">Get 14 Days Free Trial ✨</div>
+                    </button>
+                    
+                    <button class="apple-btn">
+                        <svg class="apple-logo" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 17 2.94 12.45 4.7 9.39C5.57 7.87 7.13 6.91 8.82 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+                        </svg>
+                        Continue with Apple
+                    </button>
+                </div>
+
+                <p class="footer-text">
+                    Both options include full access to personalized meditation sessions
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -43,23 +43,7 @@ struct ContentView: View {
                 VStack(spacing: 25) {
                     // Header with settings button
                     HStack {
-//                        VStack(alignment: .leading, spacing: 10) {
-//                            Text("BeKind")
-//                                .font(.largeTitle)
-//                                .fontWeight(.bold)
-//                            
-//                            Text("AI-powered guided meditation")
-//                                .font(.body)
-//                                .foregroundColor(.secondary)
-//                        }
-                        Text("Sonata")
-                            .font(.largeTitle)
-                            .fontWeight(.medium)
-                            .foregroundColor(.white)
-                            .shadow(color: .teal.opacity(0.5), radius: 8, x: 0, y: 0)
-
-
-                        
+               
                         Spacer()
                         
                         Button(action: {
@@ -468,11 +452,14 @@ struct PremiumCTAButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 16) {
+                Spacer()
+                
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 8) {
-//                        Image(systemName: "sparkles")
-//                            .font(.system(size: 16, weight: .medium))
-//                            .foregroundColor(.yellow.opacity(0.9))
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 24, weight: .medium))
+                            .foregroundColor(.white)
+                            .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
                         
                         Text("Start New Meditation")
                             .font(.title2)
@@ -481,11 +468,11 @@ struct PremiumCTAButton: View {
                         
                     }
                     
-                    Text("AI-powered guidance tailored to your emotions")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundColor(.white.opacity(0.35))
-                        .lineLimit(2)
+//                    Text("AI-powered guidance tailored to your emotions")
+//                        .font(.subheadline)
+//                        .fontWeight(.medium)
+//                        .foregroundColor(.white.opacity(0.35))
+//                        .lineLimit(2)
                 }
                 
                 Spacer()
@@ -495,11 +482,7 @@ struct PremiumCTAButton: View {
 //                        .fill(.white.opacity(0.15))
 //                        .frame(width: 56, height: 56)
                     
-                    Image(systemName: "moon.stars.fill")
-                        .font(.system(size: 24, weight: .medium))
-                        .foregroundColor(.white)
-                        .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
-                        .symbolEffect(.breathe.pulse.byLayer, options: .repeat(.continuous))
+                    
                 }
             }
             .padding(.horizontal, 24)

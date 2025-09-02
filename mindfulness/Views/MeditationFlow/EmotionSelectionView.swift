@@ -134,10 +134,10 @@ struct EmotionCard: View {
     
     private var emotionIcon: String {
         switch emotion {
-        case .anxious: return "heart.circle.fill"
+        case .anxious: return "tornado"
         case .sad: return "cloud.fill"
         case .angry: return "flame.fill"
-        case .overwhelmed: return "tornado"
+        case .overwhelmed: return "battery.25percent"
         case .excited: return "star.fill"
         case .content: return "leaf.fill"
         case .tired: return "powersleep"
