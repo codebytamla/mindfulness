@@ -15,34 +15,40 @@ struct MainContainerView: View {
     
     var body: some View {
         Group {
-            if authService.isAuthenticated {
+            if authService.isLoading {
+                // Show loading while checking authentication state
+                AuthenticationLoadingView()
+                    .transition(.opacity.combined(with: .scale(scale: 0.95)).animation(.easeOut(duration: 0.4)))
+            } else if authService.isAuthenticated {
                 // User is already authenticated (existing session)
                 if !hasCompletedOnboarding {
                     OnboardingView {
                         await completeOnboarding()
                     }
+                    .transition(.move(edge: .trailing).combined(with: .opacity).animation(.easeInOut(duration: 0.6)))
                 } else {
                     ContentView()
                         .environmentObject(authService)
+                        .transition(.move(edge: .bottom).combined(with: .opacity).animation(.spring(response: 0.8, dampingFraction: 0.8)))
                 }
-            } else if !hasSignedInWithApple && !authService.isLoading {
+            } else if !hasSignedInWithApple {
                 // No existing session and user hasn't signed in before
                 AppleSignInView {
                     hasSignedInWithApple = true
                 }
-            } else if isAuthenticating || authService.isLoading {
+                .transition(.move(edge: .leading).combined(with: .opacity).animation(.easeInOut(duration: 0.5)))
+            } else if isAuthenticating {
                 AuthenticationLoadingView()
+                    .transition(.opacity.animation(.easeInOut(duration: 0.3)))
             } else {
                 // Fallback - should retry authentication
                 AuthenticationLoadingView()
+                    .transition(.opacity.animation(.easeInOut(duration: 0.3)))
                     .task {
                         await retryAuthentication()
                     }
             }
         }
-        .animation(.easeInOut(duration: 0.5), value: hasSignedInWithApple)
-        .animation(.easeInOut(duration: 0.5), value: hasCompletedOnboarding)
-        .animation(.easeInOut(duration: 0.3), value: authService.isAuthenticated)
     }
     
     @MainActor

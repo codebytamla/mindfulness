@@ -49,7 +49,7 @@ struct ContentView: View {
                         Button(action: {
                             showingSettings = true
                         }) {
-                            Image(systemName: "gearshape.fill")
+                            Image(systemName: "person.fill")
                                 .font(.title2)
                                 .foregroundColor(.gray)
                                 .frame(width: 44, height: 44)

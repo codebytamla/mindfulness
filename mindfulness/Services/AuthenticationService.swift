@@ -21,9 +21,14 @@ class AuthenticationService: ObservableObject {
     private let supabase = SupabaseManager.shared.client
     
     private init() {
+        isLoading = true
+        
         // Check for existing session on startup
         Task {
             await checkExistingSession()
+            await MainActor.run {
+                isLoading = false
+            }
         }
         
         // Listen for auth state changes
