@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meditation App - Calm Themes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --transition-duration: 0.6s;
+        }
+
+        /* Water Theme Definitions */
+        .theme-river-flow {
+            --bg-gradient-start: #1E3A5F;
+            --bg-gradient-end: #2E5B7E;
+            --primary: #5E9EC8;
+            --accent: #8AC4E6;
+            --text-primary: #E8F4F8;
+            --text-secondary: #B8D4E3;
+            --card-bg: rgba(46, 91, 126, 0.3);
+            --button-gradient-start: #5E9EC8;
+            --button-gradient-end: #6EAED8;
+            --glow-color: rgba(138, 196, 230, 0.25);
+        }
+
+        .theme-moonlit-lake {
+            --bg-gradient-start: #0F1F3D;
+            --bg-gradient-end: #1A3254;
+            --primary: #4B7FA6;
+            --accent: #7BA7CC;
+            --text-primary: #D6E5F0;
+            --text-secondary: #A8C5D8;
+            --card-bg: rgba(26, 50, 84, 0.4);
+            --button-gradient-start: #4B7FA6;
+            --button-gradient-end: #5B8FB6;
+            --glow-color: rgba(123, 167, 204, 0.2);
+        }
+
+        .theme-tropical-lagoon {
+            --bg-gradient-start: #1B4F72;
+            --bg-gradient-end: #2E86AB;
+            --primary: #5DADE2;
+            --accent: #85C1E5;
+            --text-primary: #F0F8FC;
+            --text-secondary: #AED6F1;
+            --card-bg: rgba(46, 134, 171, 0.25);
+            --button-gradient-start: #5DADE2;
+            --button-gradient-end: #6DBDF2;
+            --glow-color: rgba(133, 193, 229, 0.3);
+        }
+
+        .theme-deep-stream {
+            --bg-gradient-start: #1C3A52;
+            --bg-gradient-end: #2C5F7C;
+            --primary: #4A90B8;
+            --accent: #6FA8C8;
+            --text-primary: #E2EFF5;
+            --text-secondary: #B0CDD9;
+            --card-bg: rgba(44, 95, 124, 0.35);
+            --button-gradient-start: #4A90B8;
+            --button-gradient-end: #5AA0C8;
+            --glow-color: rgba(111, 168, 200, 0.25);
+        }
+
+        .theme-morning-tide {
+            --bg-gradient-start: #264653;
+            --bg-gradient-end: #2A6F8A;
+            --primary: #52B2CF;
+            --accent: #84D2E4;
+            --text-primary: #EFF8FA;
+            --text-secondary: #B8DDE8;
+            --card-bg: rgba(42, 111, 138, 0.3);
+            --button-gradient-start: #52B2CF;
+            --button-gradient-end: #62C2DF;
+            --glow-color: rgba(132, 210, 228, 0.25);
+        }
+
+        .theme-crystal-springs {
+            --bg-gradient-start: #1E4E6B;
+            --bg-gradient-end: #2E7FA6;
+            --primary: #5CAFDB;
+            --accent: #8CC8E8;
+            --text-primary: #F2FAFD;
+            --text-secondary: #C2E0ED;
+            --card-bg: rgba(46, 127, 166, 0.25);
+            --button-gradient-start: #5CAFDB;
+            --button-gradient-end: #6CBFEB;
+            --glow-color: rgba(140, 200, 232, 0.28);
+        }
+
+        .theme-glacier-pool {
+            --bg-gradient-start: #1A3A52;
+            --bg-gradient-end: #285170;
+            --primary: #4682B4;
+            --accent: #6FA5D2;
+            --text-primary: #E6F2F8;
+            --text-secondary: #B0CDDE;
+            --card-bg: rgba(40, 81, 112, 0.35);
+            --button-gradient-start: #4682B4;
+            --button-gradient-end: #5692C4;
+            --glow-color: rgba(111, 165, 210, 0.22);
+        }
+
+        .theme-underwater-cave {
+            --bg-gradient-start: #0E2433;
+            --bg-gradient-end: #1C4966;
+            --primary: #3E7FA7;
+            --accent: #5A9BC7;
+            --text-primary: #D4E5F0;
+            --text-secondary: #9CBDD4;
+            --card-bg: rgba(28, 73, 102, 0.4);
+            --button-gradient-start: #3E7FA7;
+            --button-gradient-end: #4E8FB7;
+            --glow-color: rgba(90, 155, 199, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            transition: all var(--transition-duration) ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Floating Particles Animation */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .sparkle-icon {
+            width: 24px;   /* adjust size as needed */
+            height: 24px;
+        }
+
+
+        .particle {
+            position: absolute;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.4;
+            }
+            90% {
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Theme Switcher */
+        .theme-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .theme-switcher h3 {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .theme-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .theme-option {
+            padding: 10px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 400;
+            background: transparent;
+            border: 1px solid transparent;
+        }
+
+        .theme-option:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .theme-option.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Phone Container */
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            margin: 50px auto;
+            background: var(--bg-gradient-start);
+            border-radius: 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Breathing Background Circle */
+        .breathing-circle {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--glow-color) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: breathe 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.1;
+            }
+        }
+
+        .app-content {
+            padding: 60px 30px 30px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .time {
+            font-size: 18px;
+            font-weight: 300;
+        }
+
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .menu-icon:hover {
+            opacity: 1;
+        }
+
+        .menu-icon span {
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: var(--text-primary);
+            margin: 5px 0;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        /* Main Content */
+        .main-title {
+            font-size: 42px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            font-weight: 300;
+            opacity: 0.7;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        /* Main CTA Button */
+        .cta-button {
+            background: linear-gradient(135deg, var(--button-gradient-start), var(--button-gradient-end));
+            border: none;
+            padding: 20px;
+            border-radius: 24px;
+            color: white;
+            font-size: 18px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px var(--glow-color);
+            animation: gentlePulse 4s ease-in-out infinite;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes gentlePulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px var(--glow-color);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 15px 40px var(--glow-color);
+            }
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px var(--glow-color);
+        }
+
+        /* Progress Section */
+        .progress-section {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 300;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .progress-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .progress-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 20px 15px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .progress-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .progress-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .progress-value {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Recent Sessions */
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .see-all {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: opacity 0.3s;
+        }
+
+        .see-all:hover {
+            opacity: 0.7;
+        }
+
+        .session-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .session-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .session-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .session-type {
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .session-details {
+            font-size: 14px;
+            opacity: 0.6;
+            margin-bottom: 8px;
+        }
+
+        .session-time {
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        .stars {
+            color: var(--accent);
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        /* Zen Mode Toggle */
+        .zen-mode-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .zen-mode-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body class="theme-river-flow">
+    <div class="particles" id="particles"></div>
+
+    <div class="theme-switcher">
+        <h3>Theme</h3>
+        <div class="theme-options">
+            <div class="theme-option active" data-theme="theme-river-flow">River Flow</div>
+            <div class="theme-option" data-theme="theme-moonlit-lake">Moonlit Lake</div>
+            <div class="theme-option" data-theme="theme-tropical-lagoon">Tropical Lagoon</div>
+            <div class="theme-option" data-theme="theme-deep-stream">Deep Stream</div>
+            <div class="theme-option" data-theme="theme-morning-tide">Morning Tide</div>
+            <div class="theme-option" data-theme="theme-crystal-springs">Crystal Springs</div>
+            <div class="theme-option" data-theme="theme-glacier-pool">Glacier Pool</div>
+            <div class="theme-option" data-theme="theme-underwater-cave">Underwater Cave</div>
+            </div>
+    </div>
+
+    <div class="phone-container">
+        <div class="breathing-circle"></div>
+        
+        <div class="app-content">
+            <div class="header">
+                <div class="time">21:33</div>
+                <div class="menu-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <h1 class="main-title">Welcome Back</h1>
+            <p class="subtitle">You've already found peace today.<br>Ready to deepen your practice?</p>
+
+            <button class="cta-button">
+                <img src="sparkles.svg" alt="sparkle" class="sparkle-icon">
+                <span>Continue Journey</span>
+            </button>
+
+
+            <div class="progress-section">
+                <h2 class="section-title">Your Practice</h2>
+                <div class="progress-cards">
+                    <div class="progress-card">
+                        <div class="progress-icon">🌱</div>
+                        <div class="progress-value">1</div>
+                        <div class="progress-label">Sessions</div>
+                    </div>
+                    <div class="progress-card">
+                        <div class="progress-icon">⏱</div>
+                        <div class="progress-value">10</div>
+                        <div class="progress-label">Minutes</div>
+                    </div>
+                    <div class="progress-card">
+                        <div class="progress-icon">🔥</div>
+                        <div class="progress-value">1</div>
+                        <div class="progress-label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-sessions">
+                <div class="recent-header">
+                    <h2 class="section-title">Recent Sessions</h2>
+                    <a href="#" class="see-all">See All →</a>
+                </div>
+                <div class="session-card">
+                    <div class="session-header">
+                        <span>🌊</span>
+                        <span class="session-type">Body Scan</span>
+                    </div>
+                    <div class="session-details">Finding calm • 10 min</div>
+                    <div class="session-time">Today at 19:52</div>
+                    <div class="stars">★★★★★</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="zen-mode-toggle" id="zenToggle">
+        🌙 Zen Mode: <span id="zenStatus">Off</span>
+    </div>
+
+    <script>
+        // Theme Switcher
+        const themeOptions = document.querySelectorAll('.theme-option');
+        const body = document.body;
+
+        themeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove active class from all options
+                themeOptions.forEach(opt => opt.classList.remove('active'));
+                
+                // Add active class to clicked option
+                option.classList.add('active');
+                
+                // Remove all theme classes
+                body.className = '';
+                
+                // Add selected theme class
+                body.classList.add(option.dataset.theme);
+            });
+        });
+
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            particlesContainer.innerHTML = ''; // Clear existing particles before adding new ones
+            const particleCount = 15;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                
+                const size = Math.random() * 4 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Initial particle creation
+        createParticles();
+
+        // Zen Mode Toggle (removes particles for even more calm)
+        let zenMode = false;
+        const zenToggle = document.getElementById('zenToggle');
+        const zenStatus = document.getElementById('zenStatus');
+        const particles = document.getElementById('particles');
+
+        zenToggle.addEventListener('click', () => {
+            zenMode = !zenMode;
+            if (zenMode) {
+                particles.style.display = 'none';
+                zenStatus.textContent = 'On';
+                document.querySelector('.breathing-circle').style.display = 'none';
+            } else {
+                particles.style.display = 'block';
+                zenStatus.textContent = 'Off';
+                document.querySelector('.breathing-circle').style.display = 'block';
+            }
+        });
+
+        // Subtle time update
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.querySelector('.time').textContent = `${hours}:${minutes}`;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>

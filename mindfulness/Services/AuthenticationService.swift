@@ -23,12 +23,9 @@ class AuthenticationService: ObservableObject {
     private init() {
         isLoading = true
         
-        // Check for existing session on startup
+        // Check for existing session on startup with timeout
         Task {
-            await checkExistingSession()
-            await MainActor.run {
-                isLoading = false
-            }
+            await checkExistingSessionWithTimeout()
         }
         
         // Listen for auth state changes
@@ -37,43 +34,84 @@ class AuthenticationService: ObservableObject {
     
     // MARK: - Session Management
     
-    private func checkExistingSession() async {
+    private func checkExistingSessionWithTimeout() async {
+        await MainActor.run {
+            isLoading = true
+        }
+        
+        // Create timeout task
+        let timeoutTask = Task {
+            try? await Task.sleep(nanoseconds: 10_000_000_000) // 10 seconds
+            await MainActor.run {
+                if isLoading {
+                    print("⚠️ Authentication timeout - setting to not authenticated")
+                    updateAuthState(user: nil, isAuthenticated: false)
+                    isLoading = false
+                }
+            }
+        }
+        
+        // Check for existing session
         do {
             let session = try await supabase.auth.session
+            timeoutTask.cancel() // Cancel timeout since we got a response
             print("✅ Found existing session for user: \(session.user.id.uuidString)")
-            updateAuthState(user: session.user, isAuthenticated: true)
+            await MainActor.run {
+                updateAuthState(user: session.user, isAuthenticated: true)
+                // isLoading is now set to false in updateAuthState
+            }
         } catch {
+            timeoutTask.cancel() // Cancel timeout since we got a response  
             print("❌ No existing session found: \(error)")
-            updateAuthState(user: nil, isAuthenticated: false)
+            await MainActor.run {
+                updateAuthState(user: nil, isAuthenticated: false)
+                // isLoading is now set to false in updateAuthState
+            }
         }
     }
     
     private func setupAuthStateListener() {
         Task {
             for await state in supabase.auth.authStateChanges {
-                print("🔐 Auth state changed: \(state.event)")
-                switch state.event {
-                case .signedIn:
-                    print("✅ User signed in: \(state.session?.user.id.uuidString ?? "unknown")")
-                    updateAuthState(user: state.session?.user, isAuthenticated: true)
-                case .signedOut:
-                    print("❌ User signed out")
-                    updateAuthState(user: nil, isAuthenticated: false)
-                case .tokenRefreshed:
-                    print("🔄 Token refreshed for user: \(state.session?.user.id.uuidString ?? "unknown")")
-                    updateAuthState(user: state.session?.user, isAuthenticated: true)
-                default:
-                    print("🔐 Other auth event: \(state.event)")
-                    break
+                await MainActor.run {
+                    print("🔐 Auth state changed: \(state.event)")
+                    switch state.event {
+                    case .signedIn:
+                        print("✅ User signed in: \(state.session?.user.id.uuidString ?? "unknown")")
+                        updateAuthState(user: state.session?.user, isAuthenticated: true)
+                    case .signedOut:
+                        print("❌ User signed out")
+                        updateAuthState(user: nil, isAuthenticated: false)
+                    case .tokenRefreshed:
+                        print("🔄 Token refreshed for user: \(state.session?.user.id.uuidString ?? "unknown")")
+                        updateAuthState(user: state.session?.user, isAuthenticated: true)
+                    case .initialSession:
+                        print("🔄 Initial session found: \(state.session?.user.id.uuidString ?? "unknown")")
+                        if let user = state.session?.user {
+                            updateAuthState(user: user, isAuthenticated: true)
+                        } else {
+                            updateAuthState(user: nil, isAuthenticated: false)
+                        }
+                    default:
+                        print("🔐 Other auth event: \(state.event)")
+                        break
+                    }
                 }
             }
         }
     }
     
     private func updateAuthState(user: User?, isAuthenticated: Bool) {
+        print("🔄 Updating auth state - isAuthenticated: \(isAuthenticated), user: \(user?.id.uuidString ?? "nil"), isLoading: \(isLoading)")
         self.currentUser = user
         self.isAuthenticated = isAuthenticated
         self.authError = nil
+        
+        // Ensure loading is set to false when we have a definitive auth state
+        if self.isLoading {
+            self.isLoading = false
+            print("✅ Set isLoading to false after auth state update")
+        }
     }
     
     // MARK: - Apple Sign In

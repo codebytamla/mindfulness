@@ -10,7 +10,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.theme) var theme
     @Query private var sessions: [MeditationSession]
     @Query private var userProfiles: [UserProfile]
     
@@ -113,10 +113,8 @@ struct ContentView: View {
                         }) {
                             Image(systemName: "line.3.horizontal.decrease")
                                 .font(.title2)
-                                .foregroundColor(.gray)
+                                .foregroundColor(theme.textSecondary)
                                 .frame(width: 44, height: 44)
-                            //    .background(Color(UIColor.systemGray6))
-                            //    .clipShape(Circle())
 
                         }
                     }
@@ -142,18 +140,18 @@ struct ContentView: View {
                                 .multilineTextAlignment(.center)
                                 .foregroundStyle(
                                     LinearGradient(
-                                        colors: [.primary, .primary.opacity(0.8)],
+                                        colors: [theme.textPrimary, theme.textPrimary.opacity(0.8)],
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     )
                                 )
-                                .shadow(color: Color.primary.opacity(0.1), radius: 2, x: 0, y: 1)
+                                .shadow(color: theme.primary.opacity(0.1), radius: 2, x: 0, y: 1)
 
                             
                             Text(dynamicSubheadline)
                                 .font(.system(.callout, design: .rounded, weight: .medium))
                                 .multilineTextAlignment(.center)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(theme.textSecondary)
                                 .lineSpacing(2)
                                 .padding(.horizontal, 8)
                         }
@@ -174,6 +172,7 @@ struct ContentView: View {
                                 Text("Your Progress")
                                     .font(.headline)
                                     .fontWeight(.semibold)
+                                    .foregroundColor(theme.textPrimary)
                                 Spacer()
                             }
                             
@@ -182,28 +181,32 @@ struct ContentView: View {
                                     title: "Total Sessions",
                                     value: "\(sessions.count)",
                                     icon: "checkmark.circle.fill",
-                                    color: .green
+                                    color: theme.primary,
+                                    theme: theme
                                 )
                                 
                                 StatCard(
                                     title: "Total Minutes",
                                     value: "\(sessions.reduce(0) { $0 + $1.duration })",
                                     icon: "clock.fill",
-                                    color: .blue
+                                    color: theme.accent,
+                                    theme: theme
                                 )
                                 
                                 StatCard(
                                     title: "Streak",
                                     value: "\(calculateStreak()) days",
                                     icon: "flame.fill",
-                                    color: .orange
+                                    color: theme.primary,
+                                    theme: theme
                                 )
                             }
                         }
                         .padding(.horizontal)
                     }
                     
-                    // Recent sessions card
+                    // Recent sessions card - temporarily commented out
+                    /*
                     if !recentSessions.isEmpty {
                         VStack(spacing: 0) {
                             // Card header
@@ -257,6 +260,7 @@ struct ContentView: View {
                         )
                         .padding(.horizontal)
                     }
+                    */
                     
                         Spacer(minLength: adaptiveBottomSpacing(for: geometry.size.height))
                     }
@@ -362,11 +366,11 @@ struct ContentView: View {
 }
 
 struct StatCard: View {
-    @Environment(\.colorScheme) var colorScheme
     let title: String
     let value: String
     let icon: String
     let color: Color
+    let theme: ThemeColors
     
     var body: some View {
         VStack(spacing: 8) {
@@ -377,33 +381,28 @@ struct StatCard: View {
             Text(value)
                 .font(.title3)
                 .fontWeight(.semibold)
+                .foregroundColor(theme.textPrimary)
             
             Text(title)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(theme.textSecondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(
-            colorScheme == .dark 
-                ? Color(UIColor.secondarySystemGroupedBackground)
-                : Color.white.opacity(0.95)
-        )
+        .background(theme.cardBackground)
         .cornerRadius(12)
         .shadow(
-            color: colorScheme == .dark 
-                ? Color.clear 
-                : Color.black.opacity(0.06),
-            radius: 4,
+            color: theme.glowColor,
+            radius: 6,
             x: 0,
-            y: 1
+            y: 2
         )
     }
 }
 
 struct SessionCard: View {
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.theme) var theme
     let session: MeditationSession
     
     private var emotionColor: Color {
@@ -485,19 +484,13 @@ struct SessionCard: View {
             }
         }
         .padding()
-        .background(
-            colorScheme == .dark 
-                ? Color(UIColor.systemBackground)
-                : Color.white.opacity(0.98)
-        )
+        .background(theme.cardBackground)
         .cornerRadius(12)
         .shadow(
-            color: colorScheme == .dark 
-                ? Color.primary.opacity(0.1) 
-                : Color.black.opacity(0.08),
-            radius: colorScheme == .dark ? 1 : 3,
+            color: theme.glowColor,
+            radius: 3,
             x: 0,
-            y: colorScheme == .dark ? 0.5 : 1
+            y: 1
         )
     }
 }
@@ -619,14 +612,14 @@ struct ProgressIndicator: View {
 }
 
 struct FlowingBackground: View {
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.theme) var theme
     @State private var animationOffset: CGFloat = 0
     @State private var particleAnimation: Bool = false
     
     var body: some View {
         ZStack {
-            // Adaptive base background
-            (colorScheme == .dark ? Color.black : Color.gray.opacity(0.05))
+            // Theme-based background
+            theme.bgGradientStart
                 .ignoresSafeArea()
             
             // Subtle flowing gradient that adapts to color scheme
@@ -684,47 +677,31 @@ struct FlowingBackground: View {
     }
     
     private var gradientColors: [Color] {
-        if colorScheme == .dark {
-            return [
-                Color.black,
-                Color.gray.opacity(0.03),
-                Color.blue.opacity(0.02),
-                Color.black
-            ]
-        } else {
-            return [
-                Color.gray.opacity(0.08),
-                Color.gray.opacity(0.12),
-                Color.blue.opacity(0.06),
-                Color.gray.opacity(0.08)
-            ]
-        }
+        return [
+            theme.bgGradientStart,
+            theme.bgGradientEnd,
+            theme.primary.opacity(0.1),
+            theme.bgGradientStart
+        ]
     }
     
     private var particleGradientColors: [Color] {
-        if colorScheme == .dark {
-            return [Color.white.opacity(0.01), Color.clear]
-        } else {
-            return [Color.gray.opacity(0.02), Color.clear]
-        }
+        return [theme.accent.opacity(0.1), Color.clear]
     }
     
     private var meshGradientColors: [Color] {
-        if colorScheme == .dark {
-            return [Color.clear, Color.gray.opacity(0.005), Color.clear]
-        } else {
-            return [Color.clear, Color.gray.opacity(0.01), Color.clear]
-        }
+        return [Color.clear, theme.glowColor, Color.clear]
     }
     
     private var particleOpacity: Double {
-        colorScheme == .dark ? 0.3 : 0.15
+        0.3
     }
 }
 
 struct PremiumCTAButton: View {
     let buttonText: String
     let action: () -> Void
+    @Environment(\.theme) var theme
     @State private var isPressed = false
     
     var body: some View {
@@ -741,7 +718,7 @@ struct PremiumCTAButton: View {
                     Text(buttonText)
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(.white)
+                        .foregroundColor(theme.textPrimary)
                     
                 }
                 
@@ -762,9 +739,8 @@ struct PremiumCTAButton: View {
                     // Base gradient
                     LinearGradient(
                         gradient: Gradient(colors: [
-                            Color(red: 0.0, green: 0.5, blue: 1.0),     // Calm blue
-                            Color(red: 0.0, green: 0.7, blue: 0.9),     // Teal transition  
-                            Color(red: 0.0, green: 0.8, blue: 0.4)      // Peaceful green
+                            theme.buttonGradientStart,
+                            theme.buttonGradientEnd
                         ]),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -784,7 +760,7 @@ struct PremiumCTAButton: View {
             )
             .cornerRadius(20)
             .shadow(
-                color: Color.green.opacity(0.25),
+                color: theme.glowColor,
                 radius: isPressed ? 4 : 12,
                 x: 0,
                 y: isPressed ? 2 : 8

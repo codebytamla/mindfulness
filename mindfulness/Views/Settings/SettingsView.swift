@@ -10,9 +10,9 @@ import StoreKit
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.theme) private var theme
     @EnvironmentObject private var authService: AuthenticationService
-    @AppStorage("selectedAppearance") private var selectedAppearance = AppearanceMode.automatic
+    @EnvironmentObject private var themeManager: ThemeManager
     @AppStorage("notificationsEnabled") private var notificationsEnabled = true
     @AppStorage("dailyReminderTime") private var dailyReminderTime = Date()
     @AppStorage("streakReminders") private var streakReminders = true
@@ -134,29 +134,28 @@ struct SettingsView: View {
                     }
                 }
                 
-                // Appearance Section
-                Section("Appearance") {
+                // Theme Section
+                Section("Theme") {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Image(systemName: "paintbrush.fill")
-                                .foregroundColor(.orange)
+                            Image(systemName: "drop.fill")
+                                .foregroundColor(theme.accent)
                                 .frame(width: 24)
-                            Text("Theme")
+                            Text("Water Theme")
                                 .font(.body)
+                                .foregroundColor(theme.textPrimary)
                             Spacer()
                         }
                         
-                        HStack(spacing: 12) {
-                            ForEach(AppearanceMode.allCases, id: \.self) { appearance in
-                                AppearanceButton(
-                                    appearance: appearance,
-                                    isSelected: selectedAppearance == appearance
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 2), spacing: 12) {
+                            ForEach(WaterTheme.allCases, id: \.self) { waterTheme in
+                                ThemeButton(
+                                    theme: waterTheme,
+                                    isSelected: themeManager.currentTheme == waterTheme
                                 ) {
-                                    selectedAppearance = appearance
-                                    applyAppearance(appearance)
+                                    themeManager.currentTheme = waterTheme
                                 }
                             }
-                            Spacer()
                         }
                     }
                     .padding(.vertical, 4)
@@ -369,19 +368,6 @@ struct SettingsView: View {
         }
     }
     
-    private func applyAppearance(_ appearance: AppearanceMode) {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first {
-            switch appearance {
-            case .light:
-                window.overrideUserInterfaceStyle = .light
-            case .dark:
-                window.overrideUserInterfaceStyle = .dark
-            case .automatic:
-                window.overrideUserInterfaceStyle = .unspecified
-            }
-        }
-    }
     
     private func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
@@ -515,22 +501,8 @@ struct SettingsToggle: View {
     }
 }
 
-enum AppearanceMode: String, CaseIterable {
-    case light = "Light"
-    case dark = "Dark"
-    case automatic = "Automatic"
-    
-    var icon: String {
-        switch self {
-        case .light: return "sun.max.fill"
-        case .dark: return "moon.fill"
-        case .automatic: return "circle.lefthalf.filled"
-        }
-    }
-}
-
-struct AppearanceButton: View {
-    let appearance: AppearanceMode
+struct ThemeButton: View {
+    let theme: WaterTheme
     let isSelected: Bool
     let action: () -> Void
     
@@ -538,18 +510,36 @@ struct AppearanceButton: View {
         Button(action: action) {
             VStack(spacing: 8) {
                 ZStack {
-                    Circle()
-                        .fill(isSelected ? Color.blue.opacity(0.2) : Color.gray.opacity(0.1))
-                        .frame(width: 44, height: 44)
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    theme.colors.bgGradientStart,
+                                    theme.colors.bgGradientEnd
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(height: 60)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(
+                                    isSelected ? theme.colors.accent : Color.clear,
+                                    lineWidth: isSelected ? 3 : 0
+                                )
+                        )
                     
-                    Image(systemName: appearance.icon)
-                        .font(.title3)
-                        .foregroundColor(isSelected ? .blue : .secondary)
+                    // Theme accent color indicator
+                    Circle()
+                        .fill(theme.colors.accent)
+                        .frame(width: 20, height: 20)
                 }
                 
-                Text(appearance.rawValue)
+                Text(theme.rawValue)
                     .font(.caption)
-                    .foregroundColor(isSelected ? .blue : .secondary)
+                    .foregroundColor(isSelected ? theme.colors.accent : theme.colors.textSecondary)
+                    .fontWeight(isSelected ? .semibold : .regular)
             }
         }
         .buttonStyle(PlainButtonStyle())

@@ -8,21 +8,41 @@
 import SwiftUI
 import UIKit
 
+extension UIColor {
+    convenience init(_ color: Color) {
+        let components = color.components
+        self.init(red: components.r, green: components.g, blue: components.b, alpha: components.a)
+    }
+}
+
+extension Color {
+    var components: (r: Double, g: Double, b: Double, a: Double) {
+        let uiColor = UIColor(self)
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        return (Double(red), Double(green), Double(blue), Double(alpha))
+    }
+}
+
 struct MeditationAnimatedBackground: View {
+    @Environment(\.theme) var theme
+    
     var body: some View {
         ZStack {
             // Core Animation background
-            AnimatedBackgroundView()
+            AnimatedBackgroundView(theme: theme)
                 .ignoresSafeArea()
             
             // Breathing circle overlay
-            BreathingCircleView()
+            BreathingCircleView(theme: theme)
         }
     }
 }
 
 // MARK: - Core Animation Background
 struct AnimatedBackgroundView: UIViewRepresentable {
+    let theme: ThemeColors
+    
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
         setupAnimatedBackground(in: view)
@@ -30,7 +50,9 @@ struct AnimatedBackgroundView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // No updates needed
+        // Update background when theme changes
+        uiView.layer.sublayers?.removeAll()
+        setupAnimatedBackground(in: uiView)
     }
     
     private func setupAnimatedBackground(in view: UIView) {
@@ -49,11 +71,11 @@ struct AnimatedBackgroundView: UIViewRepresentable {
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = UIScreen.main.bounds
         
-        // Deep, peaceful colors
-        let color1 = UIColor(red: 0.05, green: 0.15, blue: 0.35, alpha: 1.0) // Deep blue
-        let color2 = UIColor(red: 0.1, green: 0.0, blue: 0.3, alpha: 1.0)   // Deep purple
-        let color3 = UIColor(red: 0.0, green: 0.2, blue: 0.15, alpha: 1.0)  // Deep forest green
-        let color4 = UIColor(red: 0.0, green: 0.1, blue: 0.4, alpha: 1.0)   // Midnight blue
+        // Use theme colors
+        let color1 = UIColor(theme.bgGradientStart)
+        let color2 = UIColor(theme.bgGradientEnd)
+        let color3 = UIColor(theme.primary.opacity(0.3))
+        let color4 = UIColor(theme.accent.opacity(0.2))
         
         gradientLayer.colors = [color1.cgColor, color2.cgColor]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)
@@ -121,8 +143,8 @@ struct AnimatedBackgroundView: UIViewRepresentable {
         particleCell.scaleRange = 0.2
         particleCell.scaleSpeed = -0.02
         
-        // Color and opacity
-        particleCell.color = UIColor(white: 1.0, alpha: 0.3).cgColor
+        // Color and opacity - use theme accent color
+        particleCell.color = UIColor(theme.accent.opacity(0.6)).cgColor
         particleCell.alphaSpeed = -0.02
         particleCell.alphaRange = 0.2
         
@@ -158,7 +180,7 @@ struct AnimatedBackgroundView: UIViewRepresentable {
         let wavePath = createWavePath(in: view.bounds)
         waveLayer.path = wavePath.cgPath
         waveLayer.fillColor = UIColor.clear.cgColor
-        waveLayer.strokeColor = UIColor(white: 1.0, alpha: 0.05).cgColor
+        waveLayer.strokeColor = UIColor(theme.accent.opacity(0.1)).cgColor
         waveLayer.lineWidth = 2.0
         
         view.layer.addSublayer(waveLayer)
@@ -185,7 +207,7 @@ struct AnimatedBackgroundView: UIViewRepresentable {
         waveLayer2.frame = view.bounds
         waveLayer2.path = createWavePath(in: view.bounds, amplitude: 30, wavelength: 150).cgPath
         waveLayer2.fillColor = UIColor.clear.cgColor
-        waveLayer2.strokeColor = UIColor(white: 1.0, alpha: 0.03).cgColor
+        waveLayer2.strokeColor = UIColor(theme.primary.opacity(0.05)).cgColor
         waveLayer2.lineWidth = 1.5
         
         view.layer.addSublayer(waveLayer2)
@@ -248,6 +270,7 @@ struct AnimatedBackgroundView: UIViewRepresentable {
 
 // MARK: - Breathing Circle
 struct BreathingCircleView: View {
+    let theme: ThemeColors
     @State private var scale: CGFloat = 0.8
     @State private var opacity: Double = 0.3
     
@@ -258,9 +281,9 @@ struct BreathingCircleView: View {
                 .stroke(
                     LinearGradient(
                         colors: [
-                            Color.white.opacity(0.1),
-                            Color.blue.opacity(0.2),
-                            Color.green.opacity(0.1)
+                            theme.accent.opacity(0.3),
+                            theme.primary.opacity(0.4),
+                            theme.accent.opacity(0.2)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -276,7 +299,7 @@ struct BreathingCircleView: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            Color.white.opacity(0.05),
+                            theme.glowColor,
                             Color.clear
                         ],
                         center: .center,
@@ -290,7 +313,7 @@ struct BreathingCircleView: View {
             
             // Center dot
             Circle()
-                .fill(Color.white.opacity(0.6))
+                .fill(theme.accent.opacity(0.8))
                 .frame(width: 6, height: 6)
                 .scaleEffect(scale * 0.5)
         }
@@ -320,5 +343,5 @@ struct BreathingCircleView: View {
 // MARK: - Preview
 #Preview {
     MeditationAnimatedBackground()
-        .preferredColorScheme(.dark)
+        .environment(\.theme, WaterTheme.riverFlow.colors)
 }

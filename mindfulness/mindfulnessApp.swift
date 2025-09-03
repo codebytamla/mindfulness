@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct mindfulnessApp: App {
+    @StateObject private var themeManager = ThemeManager()
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             MeditationSession.self,
@@ -28,6 +30,8 @@ struct mindfulnessApp: App {
     var body: some Scene {
         WindowGroup {
             MainContainerView()
+                .environmentObject(themeManager)
+                .environment(\.theme, themeManager.currentTheme.colors)
         }
         .modelContainer(sharedModelContainer)
     }
