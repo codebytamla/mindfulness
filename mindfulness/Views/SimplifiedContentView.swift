@@ -15,6 +15,11 @@ struct SimplifiedContentView: View {
     @Query private var sessions: [MeditationSession]
     @State private var showingSettings = false
     @State private var showingMeditationFlow = false
+    @State private var selectedEmotion: EmotionCategory?
+    @State private var emotionIntensity: Int = 5
+    @State private var selectedSituation: SituationCategory?
+    @State private var situationDescription: String?
+    @State private var currentMeditationStep = 0 // 0: emotion, 1: situation, 2: duration
     
     var body: some View {
         NavigationView {
@@ -134,18 +139,127 @@ struct SimplifiedContentView: View {
             SettingsView()
         }
         .sheet(isPresented: $showingMeditationFlow) {
-            EmotionSelectionView { emotion, intensity in
-                // Handle the emotion selection and continue the meditation flow
-                showingMeditationFlow = false
-                startMeditationFlow(emotion: emotion, intensity: intensity)
+            NavigationView {
+                Group {
+                    switch currentMeditationStep {
+                    case 0:
+                        EmotionSelectionView { emotion, intensity in
+                            selectedEmotion = emotion
+                            emotionIntensity = intensity
+                            currentMeditationStep = 1
+                        }
+                    case 1:
+                        if let emotion = selectedEmotion {
+                            SituationInputView(
+                                selectedEmotion: emotion,
+                                emotionIntensity: emotionIntensity
+                            ) { situation, description in
+                                selectedSituation = situation
+                                situationDescription = description
+                                currentMeditationStep = 2
+                            }
+                        }
+                    case 2:
+                        if let emotion = selectedEmotion {
+                            DurationSelectionView(
+                                selectedEmotion: emotion,
+                                emotionIntensity: emotionIntensity,
+                                selectedSituation: selectedSituation,
+                                situationDescription: situationDescription
+                            ) { duration in
+                                // Create and save the meditation session
+                                createMeditationSession(
+                                    emotion: emotion,
+                                    intensity: emotionIntensity,
+                                    situation: selectedSituation,
+                                    description: situationDescription,
+                                    duration: duration
+                                )
+                                resetMeditationFlow()
+                            }
+                        }
+                    default:
+                        Text("Invalid step")
+                    }
+                }
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarBackButtonHidden(false)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Cancel") {
+                            resetMeditationFlow()
+                        }
+                    }
+                }
             }
         }
     }
     
-    private func startMeditationFlow(emotion: EmotionCategory, intensity: Int) {
-        // For now, just print the selection - this will be expanded later
-        print("Starting meditation flow with emotion: \(emotion), intensity: \(intensity)")
-        // TODO: Continue to SituationInputView and then DurationSelectionView
+    private func createMeditationSession(
+        emotion: EmotionCategory,
+        intensity: Int,
+        situation: SituationCategory?,
+        description: String?,
+        duration: Int
+    ) {
+        // For now, we'll choose a meditation type based on the emotion
+        let meditationType = chooseMeditationType(for: emotion)
+        
+        // Generate a simple AI script placeholder
+        let aiScript = generateSimpleScript(for: emotion, intensity: intensity, duration: duration)
+        
+        // Create the meditation session
+        let session = MeditationSession(
+            emotion: emotion,
+            emotionIntensity: intensity,
+            duration: duration,
+            situation: situation,
+            situationDescription: description,
+            meditationType: meditationType,
+            aiGeneratedScript: aiScript
+        )
+        
+        // For demo purposes, we'll mark it as completed
+        session.isCompleted = true
+        session.actualDuration = duration
+        
+        // Save to SwiftData
+        modelContext.insert(session)
+        
+        do {
+            try modelContext.save()
+            print("✅ Meditation session saved successfully!")
+        } catch {
+            print("❌ Failed to save meditation session: \(error)")
+        }
+    }
+    
+    private func chooseMeditationType(for emotion: EmotionCategory) -> MeditationType {
+        switch emotion {
+        case .anxious, .overwhelmed:
+            return .breathwork
+        case .sad, .tired:
+            return .bodyScan
+        case .angry, .frustrated:
+            return .progressiveMuscleRelaxation
+        case .excited:
+            return .mindfulness
+        case .content:
+            return .lovingKindness
+        }
+    }
+    
+    private func generateSimpleScript(for emotion: EmotionCategory, intensity: Int, duration: Int) -> String {
+        return "A personalized \(duration)-minute meditation for feeling \(emotion.rawValue) (intensity: \(intensity)/10). This would normally be generated by AI with a full meditation script."
+    }
+    
+    private func resetMeditationFlow() {
+        showingMeditationFlow = false
+        currentMeditationStep = 0
+        selectedEmotion = nil
+        emotionIntensity = 5
+        selectedSituation = nil
+        situationDescription = nil
     }
 }
 
